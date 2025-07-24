@@ -1,8 +1,8 @@
 '''
-@author: hx
+@author: hxbj1737
 @date: 2025-07-23
 @description:
-    -
+    -PTZ（云台）控制器，设置舵机ID、位置范围、速度、加速度、波特率和串口及其他功能。
 '''
 import sys
 import os
@@ -29,26 +29,24 @@ else:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-"""
-初始化 PTZ（云台）控制器，设置舵机ID、位置范围、速度、加速度、波特率和串口。
-参数:
-v_id (int, 可选): 垂直舵机ID，默认1。
-h_id (int, 可选): 水平舵机ID，默认2。
-v_pos_range (tuple, 可选): 垂直舵机位置范围，默认(0, 4095)。
-h_pos_range (tuple, 可选): 水平舵机位置范围，默认(922, 2807)。
-v_speed (int, 可选): 垂直舵机速度，默认2400。
-h_speed (int, 可选): 水平舵机速度，默认2400。
-v_acc (int, 可选): 垂直舵机加速度，默认50。
-h_acc (int, 可选): 水平舵机加速度，默认50。
-baudrate (int, 可选): 串口波特率，默认1_000_000。
-com_port (str, 可选): 串口端口，默认'COM13'。
-异常:
-SystemExit: 如果串口无法打开或波特率设置失败则退出程序。
-"""
-
-
 class PTZ(sts, PortHandler):
     def __init__(self, v_id=1, h_id=2, v_pos_range=(1000, 3000), h_pos_range=(0, 1800), v_speed=2400, h_speed=2400, v_acc=50, h_acc=50, baudrate=1_000_000, com_port='COM13'):
+        '''
+        初始化 PTZ（云台）控制器，设置舵机ID、位置范围、速度、加速度、波特率和串口。
+        参数:
+        v_id (int, 可选): 垂直舵机ID，默认1。
+        h_id (int, 可选): 水平舵机ID，默认2。
+        v_pos_range (tuple, 可选): 垂直舵机位置范围，默认(0, 4095)。
+        h_pos_range (tuple, 可选): 水平舵机位置范围，默认(922, 2807)。
+        v_speed (int, 可选): 垂直舵机速度，默认2400。
+        h_speed (int, 可选): 水平舵机速度，默认2400。
+        v_acc (int, 可选): 垂直舵机加速度，默认50。
+        h_acc (int, 可选): 水平舵机加速度，默认50。
+        baudrate (int, 可选): 串口波特率，默认1_000_000。
+        com_port (str, 可选): 串口端口，默认'COM13'。
+        异常:
+        SystemExit: 如果串口无法打开或波特率设置失败则退出程序。
+        '''
         self.v_id = v_id
         self.h_id = h_id
         self.v_max = v_pos_range[1]
@@ -106,7 +104,7 @@ class PTZ(sts, PortHandler):
         self.set_h_pos(h_pos)
 
     def add_pos(self, v_add, h_add):
-        v_pos,h_pos,_, _ = self.get_pos_speed()
+        v_pos, h_pos, _, _ = self.get_pos_speed()
         v_pos = max(self.v_min, min(self.v_max, v_pos + v_add))
         h_pos = max(self.h_min, min(self.h_max, h_pos + h_add))
         self.set_pos(v_pos, h_pos)
@@ -152,6 +150,28 @@ class PTZ(sts, PortHandler):
         v_moving = self.get_v_moving()
         h_moving = self.get_h_moving()
         return v_moving, h_moving
+
+    def change_id(self, old_id, new_id):
+        COMM_SUCCESS = 0
+        comm_result, error = self.packetHandler.unLockEprom(old_id)
+        if comm_result != COMM_SUCCESS or error != 0:
+            print("Failed to unlock EEPROM")
+            return False
+
+        comm_result, error = self.packetHandler.write1ByteTxRx(
+            old_id, STS_ID, new_id)
+        if comm_result != COMM_SUCCESS or error != 0:
+            print("Failed to change ID")
+            return False
+
+        comm_result, error = self.packetHandler.LockEprom(new_id)
+        if comm_result != COMM_SUCCESS or error != 0:
+            print("Failed to lock EEPROM")
+            return False
+
+        print(f"ID changed successfully to {new_id}")
+        self.portHandler.closePort()
+        quit()
 
     def close(self):
         self.portHandler.closePort()
