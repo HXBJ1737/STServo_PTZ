@@ -3,8 +3,9 @@ from STservo_sdk import *
 import hx_PTZ
 
 if __name__ == "__main__":
-    try: 
-        ptz = hx_PTZ.PTZ(v_id=1, h_id=2, v_pos_range=(1000, 3000), h_pos_range=(0, 1800), v_speed=2400, h_speed=2400, v_acc=50, h_acc=50, baudrate=1_000_000, com_port='COM13')
+    try:
+        ptz = hx_PTZ.PTZ(v_id=1, h_id=2, v_pos_range=(1000, 3000), h_pos_range=(
+            0, 1800), v_speed=2400, h_speed=2400, v_acc=50, h_acc=50, baudrate=1_000_000, com_port='COM13')
         ptz.set_pos(ptz.v_min, ptz.h_min)
         while True:
             time.sleep(1)
@@ -14,8 +15,8 @@ if __name__ == "__main__":
                 break
             while True:
                 v_pos, h_pos, v_speed, h_speed = ptz.get_pos_speed()
-                print("pos: V=%d, H=%d" % (v_pos, h_pos))
-        
+                print("pre-pos: V=%d, H=%d" % (v_pos, h_pos))
+
                 v_moving, h_moving = ptz.get_moving()
                 if not v_moving and not h_moving:
                     print("Both axes are stationary.")
