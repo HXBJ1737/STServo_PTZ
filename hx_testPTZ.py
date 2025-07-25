@@ -11,6 +11,7 @@ vPos_list = [ptz.v_min, ptz.v_mid, ptz.v_max, ptz.v_mid,
              ptz.KEEP,  ptz.KEEP,  ptz.KEEP,  ptz.KEEP]
 hPos_list = [ptz.KEEP,  ptz.KEEP,  ptz.KEEP,  ptz.KEEP,
              ptz.h_min, ptz.h_mid, ptz.h_max, ptz.h_mid]
+print("start to open PTZ")
 ptz.set_pos(ptz.v_mid, ptz.h_mid)
 time.sleep(0.5)
 for v_pos, h_pos in zip(vPos_list, hPos_list):
