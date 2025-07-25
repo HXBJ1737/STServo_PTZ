@@ -1,11 +1,11 @@
 # hx_changeID.py
 from STservo_sdk import *
-import hx_PTZ
+from _hx_SERVO import SERVO
 '''
 请保证控制板仅连接一个总线舵机
 '''
-ptz = hx_PTZ.PTZ(baudrate=1_000_000, com_port='COM13')
+servo = SERVO(baudrate=1_000_000, com_port='COM16')
 try:
-    ptz.change_id(old_id=1, new_id=2)
+    servo.change_id(old_id=3, new_id=4)
 except Exception as e:
     print(e)

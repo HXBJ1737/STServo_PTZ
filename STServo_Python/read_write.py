@@ -35,9 +35,9 @@ sys.path.append("..")
 from STservo_sdk import *                      # Uses STServo SDK library
 
 # Default setting
-STS_ID                      = 1                 # STServo ID : 1
+STS_ID                      = 3                 # STServo ID : 1
 BAUDRATE                    = 1000000           # STServo default baudrate : 1000000
-DEVICENAME                  = 'COM13'    # Check which port is being used on your controller
+DEVICENAME                  = 'COM16'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
 STS_MINIMUM_POSITION_VALUE  = 922           # STServo will rotate between this value
 STS_MAXIMUM_POSITION_VALUE  = 2807

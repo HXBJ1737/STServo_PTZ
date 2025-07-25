@@ -7,9 +7,8 @@
 # This example is tested with a STServo and an URT
 #
 '''
-922 
-1881
-2807
+v_pos_range=(1000, 3000), h_pos_range=(0, 1800) :1
+v_pos_range=(0, 1412), h_pos_range=(0, 1800) :2
 '''
 import sys
 import os
@@ -35,9 +34,9 @@ sys.path.append("..")
 from STservo_sdk import *                      # Uses STServo SDK library
 
 # Default setting
-STS_ID                      = 1                 # STServo ID : 1
+STS_ID                      = 3                 # STServo ID : 1
 BAUDRATE                    = 1000000           # STServo default baudrate : 1000000
-DEVICENAME                  = 'COM13'    # Check which port is being used on your controller
+DEVICENAME                  = 'COM16'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
 
 # Initialize PortHandler instance

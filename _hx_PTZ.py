@@ -2,7 +2,7 @@
 @author: hxbj1737
 @date: 2025-07-23
 @description:
-    -PTZ（云台）控制器，设置舵机ID、位置范围、速度、加速度、波特率和串口及其他功能。
+    -PTZ（云台）控制类，设置舵机ID、位置范围、速度、加速度、波特率和串口及其他功能。
 '''
 import sys
 import os
@@ -28,6 +28,7 @@ else:
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
+
 
 class PTZ(sts, PortHandler):
     def __init__(self, v_id=1, h_id=2, v_pos_range=(1000, 3000), h_pos_range=(0, 1800), v_speed=2400, h_speed=2400, v_acc=50, h_acc=50, baudrate=1_000_000, com_port='COM13'):
@@ -64,6 +65,8 @@ class PTZ(sts, PortHandler):
         self.portHandler = PortHandler(self.com_port)
         self.packetHandler = sts(self.portHandler)
 
+        self.KEEP = -1  # 保持角度不变
+
         # Open port
         if self.portHandler.openPort():
             print("Succeeded to open the port")
@@ -98,8 +101,10 @@ class PTZ(sts, PortHandler):
             print("h_pos error:%s" % self.packetHandler.getRxPacketError(err))
 
     def set_pos(self, v_pos, h_pos):
-        v_pos = max(self.v_min, min(self.v_max, v_pos))
-        h_pos = max(self.h_min, min(self.h_max, h_pos))
+        if v_pos != self.KEEP:
+            v_pos = max(self.v_min, min(self.v_max, v_pos))
+        if h_pos != self.KEEP:
+            h_pos = max(self.h_min, min(self.h_max, h_pos))
         self.set_v_pos(v_pos)
         self.set_h_pos(h_pos)
 
@@ -151,7 +156,7 @@ class PTZ(sts, PortHandler):
         h_moving = self.get_h_moving()
         return v_moving, h_moving
 
-    def change_id(self, old_id, new_id):
+    def __change_id(self, old_id, new_id):
         COMM_SUCCESS = 0
         comm_result, error = self.packetHandler.unLockEprom(old_id)
         if comm_result != COMM_SUCCESS or error != 0:
