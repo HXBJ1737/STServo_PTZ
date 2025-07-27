@@ -108,12 +108,54 @@ class PTZ(sts, PortHandler):
         self.set_v_pos(v_pos)
         self.set_h_pos(h_pos)
 
+    def sync_set_pos(self, v_pos, h_pos):
+        '''
+        同步设置垂直和水平舵机的位置。
+        参数:
+        v_pos (int): 垂直舵机目标位置。
+        h_pos (int): 水平舵机目标位置。
+        '''
+        ret = self.packetHandler.SyncWritePosEx(
+            self.v_id, v_pos, self.v_speed, self.v_acc)
+        if ret != True:
+            print("[ID:%03d] groupSyncWrite addparam failed" % self.v_id)
+
+        ret = self.packetHandler.SyncWritePosEx(
+            self.h_id, h_pos, self.h_speed, self.h_acc)
+        if ret != True:
+            print("[ID:%03d] groupSyncWrite addparam failed" % self.h_id)
+
+       # Syncwrite goal position
+        ret = self.packetHandler.groupSyncWrite.txPacket()
+        if ret != True:
+            print("%s" % self.packetHandler.getTxRxResult(ret))
+        # Clear syncwrite parameter storage
+        self.packetHandler.groupSyncWrite.clearParam()
+
     def add_pos(self, v_add, h_add):
         v_pos, h_pos, _, _ = self.get_pos_speed()
         v_pos = max(self.v_min, min(self.v_max, v_pos + v_add))
         h_pos = max(self.h_min, min(self.h_max, h_pos + h_add))
         self.set_pos(v_pos, h_pos)
-
+    def get_v_pos(self):
+        pos, ret, err = self.packetHandler.ReadPos(self.v_id)
+        if ret != COMM_SUCCESS:
+            print("v_pos failed:%s" % self.packetHandler.getTxRxResult(ret))
+        elif err != 0:
+            print("v_pos error:%s" % self.packetHandler.getRxPacketError(err))
+        return pos
+    def get_h_pos(self):
+        pos, ret, err = self.packetHandler.ReadPos(self.h_id)
+        if ret != COMM_SUCCESS:
+            print("h_pos failed:%s" % self.packetHandler.getTxRxResult(ret))
+        elif err != 0:
+            print("h_pos error:%s" % self.packetHandler.getRxPacketError(err))
+        return pos
+    
+    def get_pos(self):
+        v_pos = self.get_v_pos()
+        h_pos = self.get_h_pos()
+        return v_pos, h_pos
     def get_v_pos_speed(self):
         pos, speed, ret, err = self.packetHandler.ReadPosSpeed(self.v_id)
         if ret != COMM_SUCCESS:
