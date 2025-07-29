@@ -103,10 +103,12 @@ class PTZ(sts, PortHandler):
     def set_pos(self, v_pos, h_pos):
         if v_pos != self.KEEP:
             v_pos = max(self.v_min, min(self.v_max, v_pos))
-        if h_pos != self.KEEP:
+        if h_pos != self.KEEP:  
             h_pos = max(self.h_min, min(self.h_max, h_pos))
         self.set_v_pos(v_pos)
         self.set_h_pos(h_pos)
+        
+      
 
     def sync_set_pos(self, v_pos, h_pos):
         '''
